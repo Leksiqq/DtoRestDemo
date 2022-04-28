@@ -6,6 +6,6 @@ namespace DtoKit.Demo;
 
 public interface IDemoController
 {
-    Task GetShipCalls(DateTime date, Int32 count, ShipCallsFilter filter);
+    Task GetShipCalls(DateTime date, Double amount, ShipCallsFilter filter);
 }
 

@@ -9,9 +9,9 @@ namespace DtoKit.Demo;
 
 public class DemoControllerProxy : Controller
 {
-    [Route("/shipCalls/{filter}/{count:int}/{date}")]
+    [Route("/shipCalls/{filter}/{amount:double}/{date}")]
     [HttpGet]
-    public async Task GetShipCalls(String date, Int32 count, String filter)
+    public async Task GetShipCalls(String date, Double amount, String filter)
     {
         DtoJsonConverterFactory dtojsonconverterfactory = HttpContext.RequestServices.GetRequiredService<DtoJsonConverterFactory>();
         JsonSerializerOptions jsonserializeroptions = new();
@@ -20,7 +20,7 @@ public class DemoControllerProxy : Controller
         ShipCallsFilter _filter = JsonSerializer.Deserialize<ShipCallsFilter>(filter, jsonserializeroptions);
         Controller controller = (Controller)HttpContext.RequestServices.GetRequiredService<IDemoController>();
         controller.ControllerContext = ControllerContext;
-        await ((IDemoController)controller).GetShipCalls(_date, count, _filter);
+        await ((IDemoController)controller).GetShipCalls(_date, amount, _filter);
     }
 }
 

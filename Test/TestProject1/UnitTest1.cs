@@ -22,7 +22,7 @@ namespace TestProject1
                 .ConfigureServices(serviceCollection =>
                 {
                     DtoKit.Demo.Setup.Configure(serviceCollection);
-                    serviceCollection.AddTransient<BaseConnector>();
+                    serviceCollection.AddTransient<HttpConnector>();
                 }).Build();
         }
 
@@ -55,11 +55,16 @@ namespace TestProject1
         [Test]
         public async Task GetShipCalls()
         {
-            Connector connector = new(_host.Services);
+            HttpConnector httpConnector = _host.Services.GetRequiredService<HttpConnector>();
+            httpConnector.BaseAddress = new Uri("https://localhost:7145");
 
-            connector.BaseAddress = new Uri("https://localhost:7145");
+            httpConnector.BeforeRequest += args => Console.WriteLine(args.Caller);
+            httpConnector.AfterResponse += args => Console.WriteLine(args.Response.StatusCode);
 
-            Task<HttpResponseMessage> task = connector.GetShipCalls(DateTime.Now, 42, new ShipCallsFilter { Voyage = "SER22001", PortName = "SPB-BRONKA", 
+            Connector connector = new(httpConnector);
+
+
+            Task<HttpResponseMessage> task = connector.GetShipCalls(DateTime.Now, 42.2, new ShipCallsFilter { Voyage = "SER22001", PortName = "SPB-BRONKA", 
                 VesselName = "FINNSUN", From = DateTime.Parse("2022-01-01"), To = DateTime.Now});
             HttpResponseMessage result = task.Result;
             Console.WriteLine(result.StatusCode);

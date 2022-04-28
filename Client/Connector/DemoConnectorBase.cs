@@ -9,21 +9,24 @@ using System.Web;
 
 namespace DtoKit.Demo;
 
-public class DemoConnectorBase : BaseConnector
+public class DemoConnectorBase
 {
-    public DemoConnectorBase(IServiceProvider services) : base(services) { }
-    public Task<HttpResponseMessage> GetShipCalls(DateTime date, Int32 count, ShipCallsFilter filter)
+    private readonly HttpConnector _httpconnector;
+    public DemoConnectorBase(HttpConnector httpconnector)
+    {
+        _httpconnector = httpconnector;
+    }
+    public Task<HttpResponseMessage> GetShipCalls(DateTime date, Double amount, ShipCallsFilter filter)
     {
         JsonSerializerOptions? jsonserializeroptions = null;
-        DtoJsonConverterFactory dtojsonconverterfactory = Services.GetRequiredService<DtoJsonConverterFactory>();
+        DtoJsonConverterFactory dtojsonconverterfactory = _httpconnector.Services.GetRequiredService<DtoJsonConverterFactory>();
         jsonserializeroptions = new();
         jsonserializeroptions.Converters.Add(dtojsonconverterfactory);
         String _date = HttpUtility.UrlEncode(JsonSerializer.Serialize(date, jsonserializeroptions));
-        String _count = HttpUtility.UrlEncode(JsonSerializer.Serialize(count, jsonserializeroptions));
+        String _amount = HttpUtility.UrlEncode(JsonSerializer.Serialize(amount, jsonserializeroptions));
         String _filter = HttpUtility.UrlEncode(JsonSerializer.Serialize(filter, jsonserializeroptions));
-        String urlpath = $"/shipCalls/{_filter}/{_count}/{_date}";
+        String urlpath = $"/shipCalls/{_filter}/{_amount}/{_date}";
         HttpRequestMessage httprequestmessage = new(HttpMethod.Get, urlpath);
-        return SendAsync(httprequestmessage);
+        return _httpconnector.SendAsync(httprequestmessage);
     }
 }
-
