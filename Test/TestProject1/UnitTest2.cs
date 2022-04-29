@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Net.Leksi.RestContract;
 using NUnit.Framework;
+using Oracle.ManagedDataAccess.Client;
 using System;
 using System.Collections.Generic;
 using System.Data.Common;
@@ -13,6 +14,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Security;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -344,6 +346,59 @@ values (@ID_SHIPCALL, @ID_LINE, @ID_ROUTE, @ID_PORT, @Voyage, @Arrival, @Departu
             new SourceGenerator(_host.Services)
             .GenerateHelpers<IConnector>("DtoKit.Demo.IDemoController", "DtoKit.Demo.DemoControllerProxy", "DtoKit.Demo.DemoConnectorBase")
             );
+    }
+
+    [Test]
+    public async Task Test2()
+    {
+        Database db = new Database(_connectionString);
+
+        using (DbDataReader dr = await db.GetShipCallsAsync1(null, null, null, null, null, null, null, null))
+        {
+            while (await dr.ReadAsync())
+            {
+                Console.WriteLine(dr["Voyage"]);
+            }
+
+        }
+
+        Console.WriteLine(db.dbConnection.State);
+
+    }
+
+    private DbConnection? _dbConnection = null;
+
+    [Test]
+    public async Task Test4()
+    {
+        using (DbDataReader dr = await GetShipCallsAsync())
+        {
+            while (await dr.ReadAsync())
+            {
+                Console.WriteLine(dr[0]);
+            }
+        }
+        Console.WriteLine(_dbConnection.State);
+    }
+
+    private async Task<DbDataReader> GetShipCallsAsync()
+    {
+        SecureString ss = new SecureString();
+        // make password here
+        ss.MakeReadOnly();
+
+
+
+
+        OracleConnection connection = new OracleConnection(
+            "Data Source=(DESCRIPTION = (ADDRESS_LIST = (ADDRESS = (PROTOCOL = TCP)(HOST = 172.16.17.9)(PORT = 1521)) ) (CONNECT_DATA = (SID = term) (SERVER = DEDICATED) ) )",
+            new OracleCredential("edipro", ss)
+            );
+        _dbConnection = connection;
+        Task t = connection.OpenAsync();
+        OracleCommand oc = new OracleCommand("select sysdate from dual", connection);
+        await t;
+        return await oc.ExecuteReaderAsync(System.Data.CommandBehavior.CloseConnection);
     }
 
 }

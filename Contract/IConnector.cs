@@ -1,12 +1,13 @@
 ﻿using Net.Leksi.RestContract;
 using System.Collections.ObjectModel;
+using System.Net.Http.Json;
 using System.Net.Mime;
 
 namespace DtoKit.Demo;
 
 public interface IConnector
 {
-    [RoutePath("/shipCalls/{filter}/{amount:double}/{date}")]
+    [RoutePath("/shipCalls/{filter}/{amount:double}/{date}?qq")]
     [HttpMethodGet]
     Task GetShipCalls(DateTime date, double amount, ShipCallsFilter filter, ObservableCollection<IShipCallForList> list);
 

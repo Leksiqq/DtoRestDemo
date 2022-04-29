@@ -301,5 +301,110 @@ where
         }
     }
 
+    public DbConnection? dbConnection = null;
+
+    public async Task<DbDataReader> GetShipCallsAsync1(string? id_line, int? id_shipcall, string? lineName, string? voyage, string? vesselName,
+            string? portName, DateTime? @from, DateTime? to)
+    {
+        SqlConnection connection = new SqlConnection(_connectionString);
+
+        dbConnection = connection;
+
+        Task t = connection.OpenAsync();
+
+        StringBuilder sb = new(@"
+select
+    s.ID_LINE,
+    s.ID_SHIPCALL,
+    s.Arrival,
+    s.Departure,
+    s.Voyage,
+    s.ID_PORT,
+    p1.Name PortName,
+    s.PrevID_SHIPCALL,
+    s.ID_ROUTE,
+    l.Name LineName,
+    r.ID_VESSEL,
+    v.Brutto VesselBrutto,
+    v.CallSign VesselCallSign,
+    v.Height VesselHeight,
+    v.Length VesselLength,
+    v.Name VesselName,
+    v.Netto VesselNetto,
+    v.Width VesselWidth,
+    v.ID_PORT VesselID_PORT,
+    p2.Name VesselPortName
+from 
+    ShipCalls s,
+    Ports p1,
+    Lines l,
+    Routes r,
+    Vessels v,
+    Ports p2
+where
+    p1.ID_PORT=s.ID_PORT
+    and l.ID_LINE=s.ID_LINE
+    and r.ID_ROUTE=s.ID_ROUTE
+    and r.ID_LINE=s.ID_LINE
+    and v.ID_VESSEL=r.ID_VESSEL
+    and p2.ID_PORT=v.ID_PORT
+");
+        List<string> where = new();
+
+        SqlCommand cmd = connection.CreateCommand();
+
+        if (id_line is { })
+        {
+            where.Add("s.ID_LINE=@ID_LINE");
+            cmd.Parameters.AddWithValue("@ID_LINE", id_line);
+        }
+        if (id_shipcall is { })
+        {
+            where.Add("s.ID_SHIPCALL=@ID_SHIPCALL");
+            cmd.Parameters.AddWithValue("@ID_SHIPCALL", id_shipcall);
+        }
+        if (lineName is { })
+        {
+            where.Add("l.Name like @LineName");
+            cmd.Parameters.AddWithValue("@LineName", lineName);
+        }
+        if (vesselName is { })
+        {
+            where.Add("v.Name like @VesselName");
+            cmd.Parameters.AddWithValue("@VesselName", vesselName);
+        }
+        if (portName is { })
+        {
+            where.Add("p1.Name like @PortName");
+            cmd.Parameters.AddWithValue("@PortName", portName);
+        }
+        if (voyage is { })
+        {
+            where.Add("s.Voyage like @Voyage");
+            cmd.Parameters.AddWithValue("@Voyage", voyage);
+        }
+        if (@from is { })
+        {
+            where.Add("s.Departure >= @DepartureFrom");
+            cmd.Parameters.AddWithValue("@DepartureFrom", @from);
+        }
+        if (to is { })
+        {
+            where.Add("s.Departure < @DepartureTo");
+            cmd.Parameters.AddWithValue("@DepartureTo", to);
+        }
+
+        if (where.Count > 0)
+        {
+            sb.Append(" and ").AppendJoin(" and ", where);
+        }
+
+        cmd.CommandText = sb.ToString();
+
+        await t.ConfigureAwait(false);
+
+        return await cmd.ExecuteReaderAsync(System.Data.CommandBehavior.CloseConnection);
+    }
+
 }
 

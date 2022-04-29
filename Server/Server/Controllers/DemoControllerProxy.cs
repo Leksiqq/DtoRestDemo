@@ -3,6 +3,7 @@
 //------------------------------
 using Microsoft.AspNetCore.Mvc;
 using Net.Leksi.Dto;
+using System.Data.Common;
 using System.Text.Json;
 
 namespace DtoKit.Demo;
@@ -22,5 +23,6 @@ public class DemoControllerProxy : Controller
         controller.ControllerContext = ControllerContext;
         await ((IDemoController)controller).GetShipCalls(_date, amount, _filter);
     }
+
 }
 

@@ -9,6 +9,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\..\RestContract\RestContractCommon\RestContractCommonDebug.csproj" />
     <ProjectReference Include="..\..\..\RestContract\RestContract\RestContractDebug.csproj" />
+    <ProjectReference Include="..\..\Database\Database.csproj" />
     <ProjectReference Include="..\..\DtoSetup\DtoSetup.csproj" />
   </ItemGroup>
 
