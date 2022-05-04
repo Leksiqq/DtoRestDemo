@@ -340,15 +340,6 @@ values (@ID_SHIPCALL, @ID_LINE, @ID_ROUTE, @ID_PORT, @Voyage, @Arrival, @Departu
     }
 
     [Test]
-    public void GenerateControllers()
-    {
-        Console.Write(
-            new SourceGenerator(_host.Services)
-            .GenerateHelpers<IConnector>("DtoKit.Demo.IDemoController", "DtoKit.Demo.DemoControllerProxy", "DtoKit.Demo.DemoConnectorBase")
-            );
-    }
-
-    [Test]
     public async Task Test2()
     {
         Database db = new Database(_connectionString);

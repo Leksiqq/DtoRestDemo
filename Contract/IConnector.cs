@@ -9,6 +9,7 @@ public interface IConnector
 {
     [RoutePath("/shipCalls/{filter}/{amount:double}/{date}?qq")]
     [HttpMethodGet]
+    [Authorization(Roles = "1, 2, 3")]
     Task GetShipCalls(DateTime date, double amount, ShipCallsFilter filter, ObservableCollection<IShipCallForList> list);
 
     [RoutePath("/form")]

@@ -7,6 +7,7 @@ using NUnit.Framework;
 using System;
 using System.Diagnostics;
 using System.Text.Json;
+using System.Threading.Tasks;
 using System.Web;
 
 public class RestContract
@@ -19,18 +20,18 @@ public class RestContract
             .ConfigureServices(serviceCollection =>
             {
                 Setup.Configure(serviceCollection);
+                serviceCollection.AddTransient<CodeGenerator>();
             }).Build();
         Trace.Listeners.Add(new ConsoleTraceListener());
         Trace.AutoFlush = true;
     }
 
     [Test]
-    public void GenerateRestSources()
+    public async Task GenerateRestSources()
     {
-        SourceGenerator sg = new(_host.Services.GetRequiredService<DtoServiceProvider>());
+        CodeGenerator codeGenerator = _host.Services.GetRequiredService<CodeGenerator>();
 
-        string result = sg.GenerateHelpers<IConnector>("DtoKit.Demo.IDemoController", "DtoKit.Demo.DemoControllerProxy", "DtoKit.Demo.DemoConnectorBase");
-        Console.WriteLine(result);
+        await codeGenerator.GenerateHelpers<IConnector>("DtoKit.Demo.IDemoController", "DtoKit.Demo.DemoControllerProxy", "DtoKit.Demo.DemoConnectorBase");
     }
 
     [Test]
