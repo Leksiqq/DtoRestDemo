@@ -1,7 +1,6 @@
 ﻿using DtoKit.Demo;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Net.Leksi.Dto;
 using Net.Leksi.RestContract;
 using NUnit.Framework;
 using System;
@@ -20,18 +19,18 @@ public class RestContract
             .ConfigureServices(serviceCollection =>
             {
                 Setup.Configure(serviceCollection);
-                serviceCollection.AddTransient<CodeGenerator>();
+                serviceCollection.AddTransient<HelpersBuilder>();
             }).Build();
         Trace.Listeners.Add(new ConsoleTraceListener());
         Trace.AutoFlush = true;
     }
 
     [Test]
-    public async Task GenerateRestSources()
+    public async Task BuildRestHelpers()
     {
-        CodeGenerator codeGenerator = _host.Services.GetRequiredService<CodeGenerator>();
+        HelpersBuilder codeGenerator = _host.Services.GetRequiredService<HelpersBuilder>();
 
-        await codeGenerator.GenerateHelpers<IConnector>("DtoKit.Demo.IDemoController", "DtoKit.Demo.DemoControllerProxy", "DtoKit.Demo.DemoConnectorBase");
+        await codeGenerator.BuildHelpers<IConnector>("DtoKit.Demo.IDemoController", "DtoKit.Demo.DemoControllerProxy", "DtoKit.Demo.DemoConnectorBase");
     }
 
     [Test]

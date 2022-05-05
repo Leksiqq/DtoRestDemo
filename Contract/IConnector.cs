@@ -14,18 +14,6 @@ public interface IConnector
 
     [RoutePath("/form")]
     [HttpMethodPost]
-    [ContentType(typeof(MultipartFormDataContent))]
-    Task Commit(
-        [Content(0)] 
-        string value0,
-        [Content(1)][SetFilename]
-        string fileName1,
-        [Content(1)][SetContentType]
-        Type contentType1,
-        [Content(1)]
-        Stream stream,
-        [Content(2)]
-        double amount
-        );
+    Task Commit([Body] IShipCall shipCall);
 
 }
