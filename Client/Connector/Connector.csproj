@@ -9,6 +9,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\..\DtoKit\DtoJsonConverter\Library\DtoJsonConverterDebug.csproj" />
     <ProjectReference Include="..\..\Contract\Contract.csproj" />
+    <ProjectReference Include="..\..\DtoSetup\DtoSetup.csproj" />
   </ItemGroup>
 
 </Project>

@@ -12,5 +12,10 @@ var app = builder.Build();
 
 app.MapControllers();
 
+app.Use(async (HttpContext context, RequestDelegate next) => 
+{
+    Console.WriteLine(context.Request.Path);
+    next?.Invoke(context);
+});
 
 app.Run();
