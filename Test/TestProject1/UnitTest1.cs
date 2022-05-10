@@ -70,5 +70,10 @@ namespace TestProject1
             Console.WriteLine(result.StatusCode);
 
         }
+
+        [Test]
+        public void TestSession()
+        {
+        }
     }
 }
