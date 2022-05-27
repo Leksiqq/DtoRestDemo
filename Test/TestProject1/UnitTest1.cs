@@ -4,10 +4,13 @@ using Microsoft.Extensions.Hosting;
 using Net.Leksi.Dto;
 using Net.Leksi.RestContract;
 using NUnit.Framework;
+using Oracle.ManagedDataAccess.Client;
 using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Linq;
 using System.Net.Http;
+using System.Security;
 using System.Threading.Tasks;
 
 namespace TestProject1
@@ -75,5 +78,43 @@ namespace TestProject1
         public void TestSession()
         {
         }
+
+        [Test]
+        public async Task TestOracle()
+        {
+            Func<Task<DbDataReader>> getReader = async () =>
+            {
+                SecureString securePasswd = new();
+
+                foreach (char ch in "")
+                {
+                    securePasswd.AppendChar(ch);
+                }
+
+                securePasswd.MakeReadOnly();
+
+                OracleCredential credential = new OracleCredential("edipro", securePasswd);
+                OracleConnection conn = new(
+                    "Data Source=(DESCRIPTION = (ADDRESS_LIST = (ADDRESS = (PROTOCOL = TCP)(HOST = 172.16.17.9)(PORT = 1521)) ) (CONNECT_DATA = (SID = term) (SERVER = DEDICATED) ) )",
+                    credential
+                    );
+                Task t = conn.OpenAsync();
+
+                OracleCommand cmd = new OracleCommand("select sysdate from dual", conn);
+
+                await t;
+
+                return await cmd.ExecuteReaderAsync(System.Data.CommandBehavior.CloseConnection);
+            };
+
+            using DbDataReader dataReader = await getReader();
+
+            while (await dataReader.ReadAsync())
+            {
+                Console.WriteLine(dataReader[0]);
+            }
+        }
+
+
     }
 }
